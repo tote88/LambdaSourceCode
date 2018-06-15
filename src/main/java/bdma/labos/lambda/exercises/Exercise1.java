@@ -4,6 +4,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.streaming.Duration;
+import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 
@@ -20,8 +21,8 @@ public class Exercise1 {
 		JavaInputDStream<ConsumerRecord<String, String>> kafkaStream = Utils.getKafkaStream(streamContext, twitterFile);
 		/*********************/
 		//insert your code here 
-		
-		
+		JavaDStream<String> statuses = kafkaStream.map(stringStringConsumerRecord -> stringStringConsumerRecord.value());
+		statuses.print();
 		
 		/********************/
 		
