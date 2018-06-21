@@ -25,7 +25,7 @@ public class Exercise1 {
 		JavaDStream<String> statuses = kafkaStream.map(t -> {
 //			String value = t.value();
 //			return value;
-				JSONObject json = new JSONObject(t.toString()); // o .value()?
+				JSONObject json = new JSONObject(t.value()); // o .value()?
 				return json.getString("text");
 		});
 		statuses.print();
