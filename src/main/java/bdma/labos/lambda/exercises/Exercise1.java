@@ -9,6 +9,7 @@ import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 
 import bdma.labos.lambda.utils.Utils;
+import twitter4j.JSONObject;
 
 public class Exercise1 {
 
@@ -21,7 +22,12 @@ public class Exercise1 {
 		JavaInputDStream<ConsumerRecord<String, String>> kafkaStream = Utils.getKafkaStream(streamContext, twitterFile);
 		/*********************/
 		//insert your code here 
-		JavaDStream<String> statuses = kafkaStream.map(stringStringConsumerRecord -> stringStringConsumerRecord.value());
+		JavaDStream<String> statuses = kafkaStream.map(t -> {
+//			String value = t.value();
+//			return value;
+				JSONObject json = new JSONObject(t.toString()); // o .value()?
+				return json.getString("text");
+		});
 		statuses.print();
 		
 		/********************/
