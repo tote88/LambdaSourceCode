@@ -1,10 +1,15 @@
 package bdma.labos.lambda.exercises;
 
+import com.mongodb.spark.MongoSpark;
+import com.mongodb.spark.rdd.api.java.JavaMongoRDD;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
+import org.bson.Document;
 import scala.Tuple2;
 import scala.Tuple3;
 import scala.Tuple4;
@@ -20,18 +25,18 @@ public class Exercise2_batch {
 	// IMPORTANT: modify to your bdma user: e.g., bdma00
 	private static String HDFS = "hdfs://master:27000/user/bdma32";
 
-	public static JavaPairDStream<Long, Tuple4<String, Double, Double, String>> sentimentAnalysis(JavaDStream<Status> statuses) {
-		JavaDStream<Status> englishStatuses = statuses
-				.filter(status -> LanguageDetector.isEnglish(status.getText()));
+	public static JavaRDD<Document> sentimentAnalysis(JavaMongoRDD<Document> statuses) {
+		JavaRDD<Document> englishStatuses = statuses
+				.filter(status -> LanguageDetector.isEnglish(status.get("text").toString()));
 
-		JavaDStream<Status> englishNotNullStatuses = englishStatuses
-				.filter(status -> status.getText() != null);
+		JavaRDD<Document> englishNotNullStatuses = englishStatuses
+				.filter(status -> status.get("text") != null);
 
-		JavaPairDStream<Long, String> tuples = englishNotNullStatuses.
-				mapToPair(status -> new Tuple2<Long, String>(status.getId(),
-						status.getText().replaceAll("[^a-zA-Z\\s]", "").trim().toLowerCase()));
+		JavaPairRDD<Long, String> tuples = englishNotNullStatuses.
+				mapToPair(status -> new Tuple2<Long, String>((Long)status.get("id"),
+						status.get("text").toString().replaceAll("[^a-zA-Z\\s]", "").trim().toLowerCase()));
 
-		JavaPairDStream<Long, String> noStopWords = tuples
+		JavaPairRDD<Long, String> noStopWords = tuples
 				.mapToPair(longStringTuple2 -> {
 					List<String> split = Arrays.asList(longStringTuple2._2.split(" "));
 					String text = "";
@@ -43,7 +48,7 @@ public class Exercise2_batch {
 				});
 
 
-		JavaPairDStream<Long, Tuple3<String, Double, Double>> tweetsScored = noStopWords
+		JavaPairRDD<Long, Tuple3<String, Double, Double>> tweetsScored = noStopWords
 				.mapToPair(longStringTuple2 -> {
 					int posWord = 0;
 					int negWord = 0;
@@ -63,18 +68,22 @@ public class Exercise2_batch {
 				});
 
 		//tweetsScored.print();
-		JavaPairDStream<Long, Tuple3<String, Double, Double>> nonNeutralTweets = tweetsScored
+		JavaPairRDD<Long, Tuple3<String, Double, Double>> nonNeutralTweets = tweetsScored
 				.filter(longTuple3Tuple2 -> longTuple3Tuple2._2._2() > 0.0 || longTuple3Tuple2._2._3() > 0.0);
 
 		//nonNeutralTweets.print();
-		JavaPairDStream<Long, Tuple4<String, Double, Double, String>> tweets = nonNeutralTweets
-				.mapToPair(longTuple3Tuple2 -> {
+		JavaRDD<Document> tweets = nonNeutralTweets
+				.map(longTuple3Tuple2 -> {
 					String dict = "";
 					if (longTuple3Tuple2._2._2() > longTuple3Tuple2._2._3()) dict = "Positive";
 					else if (longTuple3Tuple2._2._3() > longTuple3Tuple2._2._2()) dict = "Negative";
 					else dict = "Neutral";
-					Tuple4<String, Double, Double, String> t = new Tuple4<>(longTuple3Tuple2._2._1(), longTuple3Tuple2._2._2(), longTuple3Tuple2._2._3(), dict);
-					return new Tuple2<Long, Tuple4<String, Double, Double, String>>(longTuple3Tuple2._1, t);
+					Document doc = new Document();
+					doc.put("id", longTuple3Tuple2._1);
+					doc.put("text", longTuple3Tuple2._2._1());
+					doc.put("sentiment", dict);
+//					Tuple4<String, Double, Double, String> t = new Tuple4<>(longTuple3Tuple2._2._1(), longTuple3Tuple2._2._2(), longTuple3Tuple2._2._3(), dict);
+					return doc;
 				});
 
 		return tweets;
@@ -98,10 +107,13 @@ public class Exercise2_batch {
 		/*********************/		
 		//insert your code here
 
+		JavaMongoRDD<Document> rdd = MongoSpark.load(context);
 
-		
-        
-        /*********************/
+		JavaRDD<Document> documentJavaRDD = sentimentAnalysis(rdd);
+
+		MongoSpark.save(documentJavaRDD);
+
+		/*********************/
         
         context.close();
 	}

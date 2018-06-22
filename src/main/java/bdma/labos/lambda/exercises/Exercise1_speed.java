@@ -48,10 +48,12 @@ public class Exercise1_speed {
 		WriterClient writerClient = new WriterClient();
 
 		JavaDStream<String> statuses = kafkaStream.map(stringStringConsumerRecord -> stringStringConsumerRecord.value());
+
 		statuses.print();
+
 		statuses.foreachRDD(statusRDD -> {
 			for(String status : statusRDD.collect()) {
-				writerClient.write(status.getBytes());
+				writerClient.write((status+"\n").getBytes());
 			}
 		});
 
