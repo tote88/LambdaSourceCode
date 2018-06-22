@@ -66,8 +66,16 @@ public class Exercise1_speed {
 			Document doc = new Document();
 			doc.put("id", s.get("id"));
 			String text = s.get("text").toString();
-			//String[] split = text.split(" ");
+			String[] split = text.split(" ");
+			String hashtag = new String("");
+			for (String st : split) {
+				if (st.startsWith("#")) {
+					hashtag = st;
+					break;
+				}
+			}
 			doc.put("text", text);
+			doc.put("hashtag", hashtag);
 			return doc;
 		});
 		documentMap.foreachRDD((v1, v2) -> MongoSpark.save(v1));
