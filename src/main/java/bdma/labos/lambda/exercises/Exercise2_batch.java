@@ -111,6 +111,10 @@ public class Exercise2_batch {
 
 		JavaRDD<Document> documentJavaRDD = sentimentAnalysis(rdd);
 
+		for (Document doc : documentJavaRDD.collect()) {
+			System.out.println(doc.toJson());
+		}
+
 		MongoSpark.save(documentJavaRDD);
 
 		/*********************/
