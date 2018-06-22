@@ -1,14 +1,18 @@
 package bdma.labos.lambda.exercises;
 
+import bdma.labos.lambda.writers.WriterClient;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.streaming.Duration;
+import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 
 import bdma.labos.lambda.utils.Utils;
 import bdma.labos.lambda.writers.WriterServer;
+import twitter4j.JSONObject;
+import twitter4j.Status;
 
 public class Exercise1_speed {
 
@@ -37,9 +41,25 @@ public class Exercise1_speed {
 		
 		/*********************/					
 		// insert your code here
-		
-		
-			
+
+
+		WriterClient writerClient = new WriterClient();
+
+		JavaDStream<String> statuses = kafkaStream.map(stringStringConsumerRecord -> stringStringConsumerRecord.value());
+		statuses.print();
+		statuses.foreachRDD(statusRDD -> {
+			for(String status : statusRDD.collect()) {
+				writerClient.write(status.getBytes());
+			}
+		});
+
+		statuses = kafkaStream.map(s -> {
+			JSONObject json = new JSONObject(s.value());
+
+			return json.getString("text");
+		});
+
+
 		/*********************/
 
 		streamContext.start();
