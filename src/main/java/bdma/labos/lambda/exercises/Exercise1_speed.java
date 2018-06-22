@@ -1,6 +1,7 @@
 package bdma.labos.lambda.exercises;
 
 import bdma.labos.lambda.writers.WriterClient;
+import com.mongodb.spark.MongoSpark;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
@@ -11,6 +12,7 @@ import org.apache.spark.streaming.api.java.JavaStreamingContext;
 
 import bdma.labos.lambda.utils.Utils;
 import bdma.labos.lambda.writers.WriterServer;
+import org.bson.Document;
 import twitter4j.JSONObject;
 import twitter4j.Status;
 
@@ -53,12 +55,20 @@ public class Exercise1_speed {
 			}
 		});
 
-		statuses = kafkaStream.map(s -> {
-			JSONObject json = new JSONObject(s.value());
-
-			return json.getString("text");
+		JavaDStream<JSONObject> jsonObjects = statuses.map(s -> {
+			JSONObject jsonObject = new JSONObject(s);
+			return jsonObject;
 		});
 
+		JavaDStream<Document> documentMap = jsonObjects.map(s -> {
+			Document doc = new Document();
+			doc.put("id", s.get("id"));
+			String text = s.get("text").toString();
+			//String[] split = text.split(" ");
+			doc.put("text", text);
+			return doc;
+		});
+		documentMap.foreachRDD((v1, v2) -> MongoSpark.save(v1));
 
 		/*********************/
 
