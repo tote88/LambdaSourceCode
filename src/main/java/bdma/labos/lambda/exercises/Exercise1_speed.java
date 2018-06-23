@@ -76,7 +76,7 @@ public class Exercise1_speed {
 			}
 			doc.put("text", text);
 			doc.put("hashtag", hashtag);
-			doc.put("time", s.get("timestamp"));
+			doc.put("time", s.get("created"));
 			return doc;
 		});
 		documentMap.foreachRDD((v1, v2) -> MongoSpark.save(v1));
