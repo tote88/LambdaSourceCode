@@ -24,6 +24,7 @@ public class Exercise3_serving {
 
 		FindIterable<Document> results = summaryCollection.find();
 
+		System.out.println(summaryCollection.count());
 		for (Document doc : results) {
 			System.out.println(doc.getDate("time"));
 		}
