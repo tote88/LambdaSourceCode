@@ -21,7 +21,8 @@ public class Exercise3_serving {
 
 	public static Date getTwitterDate(String date) throws ParseException
 	{
-		final String TWITTER = "EEE, dd MMM yyyy HH:mm:ss Z";
+//		final String TWITTER = "EEE dd MMM yyyy HH:mm:ss Z";
+		final String TWITTER = "EEE MMM dd HHmmss ZZZZZ yyyy";
 		SimpleDateFormat sf = new SimpleDateFormat(TWITTER, Locale.ENGLISH);
 		sf.setLenient(true);
 		return sf.parse(date);
