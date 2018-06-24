@@ -113,7 +113,7 @@ public class Exercise2_batch {
 		JavaRDD<Document> documentJavaRDD = sentimentAnalysis(rdd);
         System.out.println("SENTIMDONE");
 
-		printRDD(documentJavaRDD);
+//		printRDD(documentJavaRDD);
 
 		MongoSpark.save(documentJavaRDD);
 
