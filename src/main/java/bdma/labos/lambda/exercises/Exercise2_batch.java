@@ -26,6 +26,7 @@ public class Exercise2_batch {
 	private static String HDFS = "hdfs://master:27000/user/bdma32";
 
 	public static JavaRDD<Document> sentimentAnalysis(JavaMongoRDD<Document> statuses) {
+		printRDD(statuses);
 		JavaRDD<Document> englishStatuses = statuses
 				.filter(status -> LanguageDetector.isEnglish(status.get("text").toString()));
 
@@ -111,15 +112,19 @@ public class Exercise2_batch {
 
 		JavaRDD<Document> documentJavaRDD = sentimentAnalysis(rdd);
 
-		for (Document doc : documentJavaRDD.collect()) {
-			System.out.println(doc.toJson());
-		}
+		printRDD(documentJavaRDD);
 
 		MongoSpark.save(documentJavaRDD);
 
 		/*********************/
         
         context.close();
+	}
+
+	private static void printRDD(JavaRDD<Document> documentJavaRDD) {
+		for (Document doc : documentJavaRDD.collect()) {
+			System.out.println(doc.toJson());
+		}
 	}
         
         
