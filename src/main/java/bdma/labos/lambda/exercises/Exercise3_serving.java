@@ -46,7 +46,6 @@ public class Exercise3_serving {
 		FindIterable<Document> hashtagTweets = summaryCollection.find(query);
 
 		for (Document doc : hashtagTweets) {
-			System.out.println(doc.toJson());
 
 			Document queryDoc = new Document();
 			Document eqId = new Document();
@@ -54,6 +53,7 @@ public class Exercise3_serving {
 			queryDoc.put("id", eqId);
 			FindIterable<Document> sentimentTweets = sentimentCollection.find(queryDoc);
 			for (Document doc2 : sentimentTweets) {
+				System.out.println(doc.toJson());
 				System.out.println(doc2.toJson());
 			}
 			System.out.println("=======================================");
