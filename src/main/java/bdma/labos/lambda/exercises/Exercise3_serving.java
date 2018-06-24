@@ -9,6 +9,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.spark.MongoSpark;
 import org.bson.Document;
+import org.joda.time.DateTime;
 
 public class Exercise3_serving {
 
@@ -24,9 +25,8 @@ public class Exercise3_serving {
 
 		FindIterable<Document> results = summaryCollection.find();
 
-		System.out.println(summaryCollection.count());
 		for (Document doc : results) {
-			System.out.println(doc.getDate("time"));
+			System.out.println(new DateTime(doc.getString("time")));
 		}
 
 		results = sentimentCollection.find();
