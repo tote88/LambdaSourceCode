@@ -22,14 +22,15 @@ public class Exercise3_serving {
 		MongoCollection<Document> sentimentCollection = database.getCollection("twitter_sentiment");
 		MongoCollection<Document> summaryCollection = database.getCollection("twitter_summary");
 
-		FindIterable<Document> sentimentDocuments = sentimentCollection.find();
-		FindIterable<Document> summaryDocuments = summaryCollection.find();
+		FindIterable<Document> results = sentimentCollection.find();
 
-		for (Document doc : sentimentDocuments) {
+		for (Document doc : results) {
 			System.out.println("S " + doc.toJson());
 		}
 
-		for (Document doc : summaryDocuments) {
+		results = summaryCollection.find();
+
+		for (Document doc : results) {
 			System.out.println("W " + doc.toJson());
 		}
 
