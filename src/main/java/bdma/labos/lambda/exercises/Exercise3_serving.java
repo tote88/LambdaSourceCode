@@ -45,8 +45,11 @@ public class Exercise3_serving {
 
 		FindIterable<Document> hashtagTweets = summaryCollection.find(query);
 
+		String sentiment = "Positive";
+		Date lastTimeFirstPositive = new Date();
+		boolean first = true;
+		int numTweets = 0;
 		for (Document doc : hashtagTweets) {
-
 			Document queryDoc = new Document();
 			Document eqId = new Document();
 			eqId.put("$eq", doc.get("id"));
@@ -55,6 +58,23 @@ public class Exercise3_serving {
 			for (Document doc2 : sentimentTweets) {
 				System.out.println(doc.toJson());
 				System.out.println(doc2.toJson());
+				if (doc2.getString("sentiment").equals("Positive")) {
+					if (first) {
+						lastTimeFirstPositive = getTwitterDate(doc.getString("time"));
+						first = false;
+					}
+					numTweets++;
+				} else {
+					if (!first) {
+						// Ens assegurem que hi ha hagut un primer Positive
+						Date thisTweetDate = getTwitterDate(doc.getString("time"));
+
+						long difference = (thisTweetDate.getTime() - lastTimeFirstPositive.getTime()) / 1000;
+						System.out.println("The last interval had " + numTweets + " positive tweets in " + difference + " seconds");
+						first = true;
+						numTweets = 0;
+					}
+				}
 			}
 			System.out.println("=======================================");
 		}
