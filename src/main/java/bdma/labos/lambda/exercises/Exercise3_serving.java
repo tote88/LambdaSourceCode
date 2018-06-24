@@ -38,6 +38,27 @@ public class Exercise3_serving {
         MongoCollection<Document> summaryCollection = database.getCollection("twitter_summary");
         MongoCollection<Document> sentimentCollection = database.getCollection("twitter_sentiment");
 
+		Document query = new Document();
+		Document eqHashtag = new Document();
+		eqHashtag.put("$eq", hashtag);
+		query.put("hashtag", eqHashtag);
+
+		FindIterable<Document> hashtagSentiment = sentimentCollection.find(query);
+
+		for (Document doc : hashtagSentiment) {
+			System.out.println(doc.toJson());
+
+			Document queryDoc = new Document();
+			Document eqId = new Document();
+			eqId.put("$eq", doc.get("id"));
+			queryDoc.put("id", eqId);
+			FindIterable<Document> hashtagTweets = summaryCollection.find(queryDoc);
+			for (Document doc2 : hashtagTweets) {
+				System.out.println(doc2.toJson());
+			}
+			System.out.println("=======================================");
+		}
+/*
 		FindIterable<Document> results = summaryCollection.find();
 
 		for (Document doc : results) {
@@ -49,6 +70,7 @@ public class Exercise3_serving {
 		for (Document doc : results) {
 			System.out.println("W " + doc.toJson());
 		}
+*/
 
 
 
