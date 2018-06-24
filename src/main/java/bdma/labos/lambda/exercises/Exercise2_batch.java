@@ -109,8 +109,9 @@ public class Exercise2_batch {
 		//insert your code here
 
 		JavaMongoRDD<Document> rdd = MongoSpark.load(context);
-
+        System.out.println("LOADED");
 		JavaRDD<Document> documentJavaRDD = sentimentAnalysis(rdd);
+        System.out.println("SENTIMDONE");
 
 		printRDD(documentJavaRDD);
 
