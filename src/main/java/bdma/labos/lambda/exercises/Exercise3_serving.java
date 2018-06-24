@@ -11,7 +11,21 @@ import com.mongodb.spark.MongoSpark;
 import org.bson.Document;
 import org.joda.time.DateTime;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class Exercise3_serving {
+
+
+	public static Date getTwitterDate(String date) throws ParseException
+	{
+		final String TWITTER = "EEE, dd MMM yyyy HH:mm:ss Z";
+		SimpleDateFormat sf = new SimpleDateFormat(TWITTER, Locale.ENGLISH);
+		sf.setLenient(true);
+		return sf.parse(date);
+	}
 
 	public static void run(String hashtag) throws Exception {
 								
@@ -26,7 +40,7 @@ public class Exercise3_serving {
 		FindIterable<Document> results = summaryCollection.find();
 
 		for (Document doc : results) {
-			System.out.println(new DateTime(doc.getString("time")));
+			System.out.println(getTwitterDate(doc.getString("time")));
 		}
 
 		results = sentimentCollection.find();
