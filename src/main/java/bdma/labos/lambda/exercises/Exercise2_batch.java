@@ -98,7 +98,7 @@ public class Exercise2_batch {
 		SparkSession spark = SparkSession.builder()
 			      .master("spark://master:7077")
 			      .appName("LambdaArchitecture")
-			      .config("spark.mongodb.input.uri", "mongodb://master:27017/twitter.twitter_sentiment")
+			      .config("spark.mongodb.input.uri", "mongodb://master:27017/twitter.twitter_summary")
 			      .config("spark.mongodb.output.uri", "mongodb://master:27017/twitter.twitter_sentiment")
 			      .getOrCreate();
 		 
