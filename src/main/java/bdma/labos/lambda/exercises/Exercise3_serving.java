@@ -19,16 +19,16 @@ public class Exercise3_serving {
 
 		MongoClient client = new MongoClient();
 		MongoDatabase database = client.getDatabase("twitter");
-		MongoCollection<Document> sentimentCollection = database.getCollection("twitter_sentiment");
-		MongoCollection<Document> summaryCollection = database.getCollection("twitter_summary");
+        MongoCollection<Document> summaryCollection = database.getCollection("twitter_summary");
+        MongoCollection<Document> sentimentCollection = database.getCollection("twitter_sentiment");
 
-		FindIterable<Document> results = sentimentCollection.find();
+		FindIterable<Document> results = summaryCollection.find();
 
 		for (Document doc : results) {
-			System.out.println("S " + doc.toJson());
+			System.out.println(doc.getDate("time"));
 		}
 
-		results = summaryCollection.find();
+		results = sentimentCollection.find();
 
 		for (Document doc : results) {
 			System.out.println("W " + doc.toJson());
